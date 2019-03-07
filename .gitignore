@@ -1,2 +1,4 @@
 *.bz2
+text.xml
+lex.yy.c
 
