@@ -2,13 +2,11 @@
 #include <glib.h>
 #include <stdlib.h>
 
+typedef struct fullQuote;
 
-typedef struct GARRAY_quotes* QUOTES;
+fullQuote create_garray_quotes (char* quote, char* traducao);
 
-//AUTORES_QUOTES create_hashtable_autores_quotes (char* autor, GArray* quotes);
+char* getQuote (fullQuote q);
 
-QUOTES create_garray_quotes (char* quote, char* traducao);
+char* getTraducao (fullQuote q);
 
-quote getQuote (QUOTES q);
-
-traducao getTraducao (QUOTES q);

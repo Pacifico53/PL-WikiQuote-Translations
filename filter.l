@@ -2,21 +2,30 @@
 #include <stdio.h>
 #include <glib.h>
 #include <gmodule.h>
+#include "estrutura.h"
 GArray *allQuotes;
+GHashTable *hash;
 char *s;
 int size = 0;
+char* autor;
 %}
 %x QUOTES
+%x ALL
 %%
-\<revision\>\n.*\<id\>165415.*          { BEGIN QUOTES;}
+\<revision\>\n.*\<id\>165415.*          { BEGIN ALL;}
+<ALL>\{\{Autor                          { BEGIN QUOTES;}
+<QUOTES>.*Nome.*=.*                     { autor = strdup(yytext);printf("!!!!%s\n", autor);}     
 <QUOTES>^\*\ ([\“\'\"]|&quot;).* {
     s = strdup(yytext);
+    fullQuote q = newQUOTE(s, " "); 
     g_array_append_val(allQuotes, s);
     size++;
     }
-<QUOTES>^[:\-* ]+Tradução.*:.*          { printf("TRADUÇAO:\"%s\"\n", yytext); }
+<QUOTES>^[:\-* ]+Tradução.*:.*          { printf("TRADUÇAO:\"%s\" %s\n", yytext, autor); }
+<QUOTES>\</page\>                       { BEGIN ALL;}    
 .|\n         {;}
 <QUOTES>.|\n {;}
+<ALL>.|\n {;}
 %%
 
 int yywrap(){
@@ -24,6 +33,7 @@ int yywrap(){
 }
 
 int main() {
+    hash = g_hash_table_new(NULL, NULL);
     allQuotes = g_array_new(FALSE, FALSE, sizeof(char*));
     printf("Vou começar...\n");
     yylex();
