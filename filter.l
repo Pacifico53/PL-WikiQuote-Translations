@@ -2,27 +2,69 @@
 #include <stdio.h>
 #include <glib.h>
 #include <gmodule.h>
-#include "estrutura.h"
-GArray *allQuotes;
-GHashTable *hash;
-char *s;
-int size = 0;
-char* autor;
+int countT = 0, countQ = 0, countA = 0;
+
+void removeSubstring(char *s,const char *toremove){
+  while( s=strstr(s,toremove) )
+    memmove(s,s+strlen(toremove),1+strlen(s+strlen(toremove)));
+}
+
+void trim(char *str){
+    size_t totrim;
+    int i = 0;
+    char* seps = "\t\n\v\f\r ";
+    totrim = strspn(str, seps);
+    if (totrim > 0) {
+        size_t len = strlen(str);
+        if (totrim == len) {
+            str[0] = '\0';
+        }
+        else {
+            memmove(str, str + totrim, len + 1 - totrim);
+        }
+    }
+
+    i = strlen(str) - 1;
+    while (i >= 0 && strchr(seps, str[i]) != NULL) {
+        str[i] = '\0';
+        i--;
+    }
+}
+
+void cleanString(char *s){
+    removeSubstring(s, "&quot;");
+    removeSubstring(s, "*");
+    removeSubstring(s, "\'");
+    removeSubstring(s,"“");
+    trim(s);
+}
+
 %}
 %x QUOTES
 %x ALL
 %%
 \<revision\>\n.*\<id\>165415.*          { BEGIN ALL;}
 <ALL>\{\{Autor                          { BEGIN QUOTES;}
-<QUOTES>.*Nome.*=.*                     { autor = strdup(yytext);printf("!!!!%s\n", autor);}     
-<QUOTES>^\*\ ([\“\'\"]|&quot;).* {
-    s = strdup(yytext);
-    fullQuote q = newQUOTE(s, " "); 
-    g_array_append_val(allQuotes, s);
-    size++;
+<QUOTES>.*Nome.*=.* {
+    char* autor = strdup(yytext+6);
+    removeSubstring(autor, "=");
+    cleanString(autor);
+    printf("\nQuotes de %s:\n\n", autor);
+    countA++;
     }
-<QUOTES>^[:\-* ]+Tradução.*:.*          { printf("TRADUÇAO:\"%s\" %s\n", yytext, autor); }
-<QUOTES>\</page\>                       { BEGIN ALL;}    
+<QUOTES>^\*(\ )?([\“\'\"]|&quot;).* {
+    char* s = strdup(yytext);
+    cleanString(s);
+    printf("\n\t\"%s\"\n",s);
+    countQ++;
+    }
+<QUOTES>^[:\-* ]+Tradução.*:.*  {
+    char* trad = strdup(yytext);
+    cleanString(trad);
+    printf("\t-->%s\n", trad);
+    countT++;
+    }
+<QUOTES>\</page\>                       { BEGIN ALL;}
 .|\n         {;}
 <QUOTES>.|\n {;}
 <ALL>.|\n {;}
@@ -32,15 +74,15 @@ int yywrap(){
     return 1;
 }
 
+
+
 int main() {
-    hash = g_hash_table_new(NULL, NULL);
-    allQuotes = g_array_new(FALSE, FALSE, sizeof(char*));
     printf("Vou começar...\n");
     yylex();
-    int i = 0;
-    for(i = 0; i < size; i++){
-        printf("QUOTE: %s\n", g_array_index(allQuotes, char*, i));
-    }
+    printf("All done.\n");
+    printf("Numero Autores = %d.\n", countA);
+    printf("Numero Quotes = %d.\n", countQ);
+    printf("Numero Traduções = %d\n", countT); 
     printf("Vou terminar...\n");
     return 0;
 }
