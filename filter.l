@@ -1,7 +1,5 @@
 %{
 #include <stdio.h>
-#include <glib.h>
-#include <gmodule.h>
 int countT = 0, countQ = 0, countA = 0;
 
 void removeSubstring(char *s,const char *toremove){
