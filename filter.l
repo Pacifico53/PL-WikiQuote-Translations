@@ -33,7 +33,8 @@ void cleanString(char *s){
     removeSubstring(s, "&quot;");
     removeSubstring(s, "*");
     removeSubstring(s, "\'");
-    removeSubstring(s,"“");
+    removeSubstring(s, "\"");
+    removeSubstring(s, "“");
     trim(s);
 }
 
