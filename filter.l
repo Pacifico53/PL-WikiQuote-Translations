@@ -1,5 +1,20 @@
 %{
-#include <stdio.h>
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<ctype.h>
+
+FILE* inicial;
+FILE* quotes;
+FILE* autor;
+FILE* traducoes;
+FILE* estatistica;
+
+char*filename[1024];
+char* nome_autor;
+char* texto_quote;
+
 int countT = 0, countQ = 0, countA = 0;
 
 void removeSubstring(char *s,const char *toremove){
@@ -45,21 +60,28 @@ void cleanString(char *s){
 \<revision\>\n.*\<id\>165415.*          { BEGIN ALL;}
 <ALL>\{\{Autor                          { BEGIN QUOTES;}
 <QUOTES>.*Nome.*=.* {
-    char* autor = strdup(yytext+6);
-    removeSubstring(autor, "=");
-    cleanString(autor);
-    printf("\nQuotes de %s:\n\n", autor);
+    nome_autor = strdup(yytext+6);
+    removeSubstring(nome_autor, "=");
+
+
+    cleanString(nome_autor);
+
+    printf("\nQuotes de %s:\n\n", nome_autor);
     countA++;
     }
 <QUOTES>^\*(\ )?([\“\'\"]|&quot;).* {
-    char* s = strdup(yytext);
-    cleanString(s);
-    printf("\n\t\"%s\"\n",s);
+
+    texto_quote = strdup(yytext);
+    fprintf(quotes,"<p>%s %s</p>", texto_quote , nome_autor);
+    cleanString(texto_quote); 
+    printf("\n\t\"%s\"\n",texto_quote);
     countQ++;
     }
 <QUOTES>^[:\-* ]+Tradução.*:.*  {
+
     char* trad = strdup(yytext);
     cleanString(trad);
+    fprintf(traducoes,"<p> %s </p><p> %s </p>", texto_quote ,trad);
     printf("\t-->%s\n", trad);
     countT++;
     }
@@ -77,7 +99,23 @@ int yywrap(){
 
 int main() {
     printf("Vou começar...\n");
+
+    inicial = fopen("index.html", "w");
+    quotes = fopen("quotes.html", "w");
+    traducoes = fopen("traducoes.html", "w");
+    estatistica = fopen("estatistica.html", "w");
+    
+    fprintf(inicial,"<a href=\"%s\">%s</a><br><hr>","quotes.html", "Quotes com os Autores");
+    fprintf(inicial,"<a href=\"%s\">%s</a><br><hr>","traducoes.html", "Traduções");
+    fprintf(inicial,"<a href=\"%s\">%s</a><br><hr>","estatistica.html", "Estatistica");
+    
     yylex();
+
+    fclose(inicial);
+    fclose(quotes);
+    fclose(traducoes);
+    fclose(estatistica);
+    
     printf("All done.\n");
     printf("Numero Autores = %d.\n", countA);
     printf("Numero Quotes = %d.\n", countQ);
