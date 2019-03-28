@@ -84,6 +84,7 @@ void cleanString(char *s){
     printf("\t-->%s\n", trad);
     countT++;
     }
+
 <QUOTES>\</page\>                       { BEGIN ALL;}
 .|\n         {;}
 <QUOTES>.|\n {;}
@@ -108,7 +109,12 @@ int main() {
     fprintf(inicial,"<a href=\"%s\">%s</a><br><hr>","traducoes.html", "Traduções");
     fprintf(inicial,"<a href=\"%s\">%s</a><br><hr>","estatistica.html", "Estatistica");
     
+    fprintf(estatistica,"<table>");
+    
     yylex();
+    fprintf(estatistica,"<h4>Há %d autores</h4><br><hr>", countA);
+    fprintf(estatistica,"<h4>Há %d quotes</h4><br><hr>", countQ);
+    fprintf(estatistica,"<h4>Há %d traduções</h4><br><hr>", countT);
 
     fclose(inicial);
     fclose(quotes);
