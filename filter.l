@@ -11,7 +11,7 @@ FILE* autor;
 FILE* traducoes;
 FILE* estatistica;
 
-char*filename[1024];
+char* filename[1024];
 char* nome_autor;
 char* texto_quote;
 
@@ -48,7 +48,8 @@ void cleanString(char *s){
     removeSubstring(s, "&quot;");
     removeSubstring(s, "*");
     removeSubstring(s, "\'");
-    removeSubstring(s,"“");
+    removeSubstring(s, "\"");
+    removeSubstring(s, "“");
     trim(s);
 }
 
