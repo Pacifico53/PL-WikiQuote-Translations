@@ -58,28 +58,27 @@ void cleanString(char *s){
 %x ALL
 %%
 \<revision\>\n.*\<id\>165415.*          { BEGIN ALL;}
-<ALL>\{\{Autor                          { BEGIN QUOTES;}
-<QUOTES>.*Nome.*=.* {
-    nome_autor = strdup(yytext+6);
-    removeSubstring(nome_autor, "=");
+<ALL>\<page\>                          { BEGIN QUOTES;}
+<QUOTES>\<title\>.* {
+    nome_autor = strdup(yytext);
     cleanString(nome_autor);
 
     printf("\nQuotes de %s:\n\n", nome_autor);
     countA++;
     }
-<QUOTES>^\*(\ )?([\“\'\"]|&quot;).* {
-    texto_quote = strdup(yytext);
-    fprintf(quotes,"<p>%s %s</p>", texto_quote , nome_autor);
-    cleanString(texto_quote); 
-    printf("\n\t\"%s\"\n",texto_quote);
-    countQ++;
-    }
-<QUOTES>^[*:\-\ '\"]+Traduç.*:.*  {
+<QUOTES>^[*:\-\ '\"\“]+Traduç.*:.*  {
     char* trad = strdup(yytext);
     cleanString(trad);
     fprintf(traducoes,"<tr><td> %s </td><td> %s </td></tr>", texto_quote ,trad);
     printf("\t-->%s\n", trad);
     countT++;
+    }
+<QUOTES>^\*+.* {
+    texto_quote = strdup(yytext);
+    fprintf(quotes,"<p>%s %s</p>", texto_quote , nome_autor);
+    cleanString(texto_quote); 
+    printf("\n\t\"%s\"\n",texto_quote);
+    countQ++;
     }
 <QUOTES>\</page\>                       { BEGIN ALL;}
 .|\n         {;}
