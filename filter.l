@@ -81,7 +81,7 @@ void cleanString(char *s){
 
     char* trad = strdup(yytext);
     cleanString(trad);
-    fprintf(traducoes,"<p> %s </p><p> %s </p>", texto_quote ,trad);
+    fprintf(traducoes,"<tr><td> %s </td><td> %s </td></tr>", texto_quote ,trad);
     printf("\t-->%s\n", trad);
     countT++;
     }
@@ -110,12 +110,13 @@ int main() {
     fprintf(inicial,"<a href=\"%s\">%s</a><br><hr>","traducoes.html", "Traduções");
     fprintf(inicial,"<a href=\"%s\">%s</a><br><hr>","estatistica.html", "Estatistica");
     
-    fprintf(estatistica,"<table>");
-    
+    fprintf(traducoes,"<style> table, th, td { border: 1px solid black;} </style> <table> <tr><th>Quote</th><th>Traducao</th></tr>");
     yylex();
+    fprintf(traducoes,"</table>");
+
     fprintf(estatistica,"<h4>Há %d autores</h4><br><hr>", countA);
     fprintf(estatistica,"<h4>Há %d quotes</h4><br><hr>", countQ);
-    fprintf(estatistica,"<h4>Há %d traduções</h4><br><hr>", countT);
+    fprintf(estatistica,"<h4>Há %d traducoes</h4><br><hr>", countT);
 
     fclose(inicial);
     fclose(quotes);
@@ -129,4 +130,3 @@ int main() {
     printf("Vou terminar...\n");
     return 0;
 }
-
