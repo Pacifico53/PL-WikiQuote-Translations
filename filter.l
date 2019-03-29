@@ -62,30 +62,25 @@ void cleanString(char *s){
 <QUOTES>.*Nome.*=.* {
     nome_autor = strdup(yytext+6);
     removeSubstring(nome_autor, "=");
-
-
     cleanString(nome_autor);
 
     printf("\nQuotes de %s:\n\n", nome_autor);
     countA++;
     }
 <QUOTES>^\*(\ )?([\“\'\"]|&quot;).* {
-
     texto_quote = strdup(yytext);
     fprintf(quotes,"<p>%s %s</p>", texto_quote , nome_autor);
     cleanString(texto_quote); 
     printf("\n\t\"%s\"\n",texto_quote);
     countQ++;
     }
-<QUOTES>^[:\-* ]+Tradução.*:.*  {
-
+<QUOTES>^[*:\-\ '\"]+Traduç.*:.*  {
     char* trad = strdup(yytext);
     cleanString(trad);
     fprintf(traducoes,"<tr><td> %s </td><td> %s </td></tr>", texto_quote ,trad);
     printf("\t-->%s\n", trad);
     countT++;
     }
-
 <QUOTES>\</page\>                       { BEGIN ALL;}
 .|\n         {;}
 <QUOTES>.|\n {;}
