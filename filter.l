@@ -22,10 +22,12 @@ void removeSubstring(char *s,const char *toremove){
     memmove(s,s+strlen(toremove),1+strlen(s+strlen(toremove)));
 }
 
-void trim(char *str){
+void trim(char *str, char *seps){
     size_t totrim;
     int i = 0;
-    char* seps = "\t\n\v\f\r ";
+    if(!seps){
+        seps = "\t\n\v\f\r ";
+    }
     totrim = strspn(str, seps);
     if (totrim > 0) {
         size_t len = strlen(str);
@@ -50,47 +52,48 @@ void cleanString(char *s){
     removeSubstring(s, "\'");
     removeSubstring(s, "\"");
     removeSubstring(s, "“");
-    trim(s);
+    trim(s, NULL);
 }
 
 %}
 %x QUOTES
 %x ALL
 %%
-\<revision\>\n.*\<id\>165415.*          { BEGIN ALL;}
-<ALL>\<page\>                          { BEGIN QUOTES;}
+\<sha1\>rv40uc.*                    { BEGIN ALL;}       /* A primeira page que de facto tem quotes aparece depois deste sha1.*/
+<ALL>\<page\>                       { BEGIN QUOTES;}    
+<QUOTES>\<title\>Wiki.*             { BEGIN ALL;}       /* Estas paginas têm texto em formato quote que nao é quote*/
+<QUOTES>\<title\>Ajuda:.*           { BEGIN ALL;}       /* por isso colocamos esta regra para nao procurar quotes nelas.*/
 <QUOTES>\<title\>.* {
-    nome_autor = strdup(yytext);
+    nome_autor = strdup(yytext+7);
     cleanString(nome_autor);
-
+    trim(nome_autor, "</title>");
     printf("\nQuotes de %s:\n\n", nome_autor);
     countA++;
     }
 <QUOTES>^[*:\-\ '\"\“]+Traduç.*:.*  {
     char* trad = strdup(yytext);
     cleanString(trad);
-    fprintf(traducoes,"<tr><td> %s </td><td> %s </td></tr>", texto_quote ,trad);
+    trim(trad, ":-");
+    fprintf(traducoes,"<tr><td> %s </td><td> %s </td></tr>\n", texto_quote ,trad);
     printf("\t-->%s\n", trad);
     countT++;
     }
-<QUOTES>^\*+.* {
+<QUOTES>^\*+(\ )?([\“\'\"]|&quot;)?.* {
     texto_quote = strdup(yytext);
-    fprintf(quotes,"<p>%s %s</p>", texto_quote , nome_autor);
     cleanString(texto_quote); 
+    fprintf(quotes,"<p>%s -- %s</p>\n", texto_quote , nome_autor);
     printf("\n\t\"%s\"\n",texto_quote);
     countQ++;
     }
-<QUOTES>\</page\>                       { BEGIN ALL;}
-.|\n         {;}
-<QUOTES>.|\n {;}
-<ALL>.|\n {;}
+<QUOTES>\</page\>                   { BEGIN ALL;}
+.|\n            {;}
+<QUOTES>.|\n    {;}
+<ALL>.|\n       {;}
 %%
 
 int yywrap(){
     return 1;
 }
-
-
 
 int main() {
     printf("Vou começar...\n");
@@ -100,24 +103,24 @@ int main() {
     traducoes = fopen("traducoes.html", "w");
     estatistica = fopen("estatistica.html", "w");
     
-    fprintf(inicial,"<a href=\"%s\">%s</a><br><hr>","quotes.html", "Quotes com os Autores");
-    fprintf(inicial,"<a href=\"%s\">%s</a><br><hr>","traducoes.html", "Traduções");
-    fprintf(inicial,"<a href=\"%s\">%s</a><br><hr>","estatistica.html", "Estatistica");
+    fprintf(inicial,"<a href=\"%s\">%s</a><br><hr>\n","quotes.html", "Quotes com os Autores");
+    fprintf(inicial,"<a href=\"%s\">%s</a><br><hr>\n","traducoes.html", "Traduções");
+    fprintf(inicial,"<a href=\"%s\">%s</a><br><hr>\n","estatistica.html", "Estatistica");
     
-    fprintf(traducoes,"<style> table, th, td { border: 1px solid black;} </style> <table> <tr><th>Quote</th><th>Traducao</th></tr>");
+    fprintf(traducoes,"<style> table, th, td { border: 1px solid black;} </style> <table> <tr><th>Quotes</th><th>Traduções</th></tr>\n");
     yylex();
-    fprintf(traducoes,"</table>");
+    fprintf(traducoes,"</table>\n");
 
-    fprintf(estatistica,"<h4>Há %d autores</h4><br><hr>", countA);
-    fprintf(estatistica,"<h4>Há %d quotes</h4><br><hr>", countQ);
-    fprintf(estatistica,"<h4>Há %d traducoes</h4><br><hr>", countT);
+    fprintf(estatistica,"<h4>Encontrados %d autores</h4><br><hr>\n", countA);
+    fprintf(estatistica,"<h4>Encontrados %d quotes</h4><br><hr>\n", countQ);
+    fprintf(estatistica,"<h4>Encontrados %d traducoes</h4><br><hr>\n", countT);
 
     fclose(inicial);
     fclose(quotes);
     fclose(traducoes);
     fclose(estatistica);
     
-    printf("All done.\n");
+    printf("Input todo percorrido.\n");
     printf("Numero Autores = %d.\n", countA);
     printf("Numero Quotes = %d.\n", countQ);
     printf("Numero Traduções = %d\n", countT); 
