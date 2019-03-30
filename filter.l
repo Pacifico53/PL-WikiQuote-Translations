@@ -63,6 +63,9 @@ void cleanString(char *s){
 <ALL>\<page\>                       { BEGIN QUOTES;}    
 <QUOTES>\<title\>Wiki.*             { BEGIN ALL;}       /* Estas paginas têm texto em formato quote que nao é quote*/
 <QUOTES>\<title\>Ajuda:.*           { BEGIN ALL;}       /* por isso colocamos esta regra para nao procurar quotes nelas.*/
+<QUOTES>\<title\>Nacionalismo.*     { BEGIN ALL;}
+<QUOTES>\<title\>Locu.*             { BEGIN ALL;}
+<QUOTES>\<title\>Castleva.*         { BEGIN ALL;}
 <QUOTES>\<title\>.* {
     nome_autor = strdup(yytext+7);
     cleanString(nome_autor);
@@ -78,7 +81,7 @@ void cleanString(char *s){
     printf("\t-->%s\n", trad);
     countT++;
     }
-<QUOTES>^\*+(\ )?([\“\'\"]|&quot;)?.* {
+<QUOTES>^\*\ +[^\[\{].* {
     texto_quote = strdup(yytext);
     cleanString(texto_quote); 
     fprintf(quotes,"<p>%s -- %s</p>\n", texto_quote , nome_autor);
@@ -127,3 +130,4 @@ int main() {
     printf("Vou terminar...\n");
     return 0;
 }
+
