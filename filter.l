@@ -14,6 +14,7 @@ FILE* estatistica;
 char* filename[1024];
 char* nome_autor;
 char* texto_quote;
+char* antigo_autor;
 
 int countT = 0, countQ = 0, countA = 0;
 
@@ -83,11 +84,19 @@ void cleanString(char *s){
     }
 <QUOTES>^\*\ +[^\[\{].* {
     texto_quote = strdup(yytext);
-    cleanString(texto_quote); 
-    fprintf(quotes,"<p>%s <strong>-- %s</strong></p>\n", texto_quote , nome_autor);
-    printf("\n\t\"%s\"\n",texto_quote);
-    countQ++;
+    cleanString(texto_quote);
+    if(nome_autor==antigo_autor){
+        fprintf(quotes,"<li>%s</li>\n", texto_quote);
+        printf("\n\t\"%s\"\n",texto_quote);
+        countQ++;
     }
+    else{
+        antigo_autor=nome_autor;
+        fprintf(quotes,"</ul>\n <p><strong>-- %s</strong></p>\n <ul><li>%s</li>\n", nome_autor , texto_quote);
+        printf("\n\t\"%s\"\n",texto_quote);
+        countQ++;
+    }
+}
 <QUOTES>\</page\>                   { BEGIN ALL;}
 .|\n            {;}
 <QUOTES>.|\n    {;}
