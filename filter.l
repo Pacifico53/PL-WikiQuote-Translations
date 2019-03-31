@@ -69,15 +69,15 @@ void cleanString(char *s){
     nome_autor = strdup(yytext+7);
     cleanString(nome_autor);
     trim(nome_autor, "</title>");
-    printf("\nQuotes de %s:\n\n", nome_autor);
+    printf("\nA procurar quotes de %s:\n-->", nome_autor);
     countA++;
     }
 <QUOTES>^[*:\-\ '\"\“]+Traduç.*:.*  {
     char* trad = strdup(yytext);
     cleanString(trad);
     trim(trad, ":-");
-    fprintf(traducoes,"<tr><td> %s </td><td> %s </td></tr>\n", texto_quote ,trad);
-    printf("\t-->%s\n", trad);
+    fprintf(traducoes,"<tr><td> %s </td>\n<td> %s </td></tr>\n", texto_quote ,trad);
+    printf("T");
     countT++;
     }
 <QUOTES>^\*\ +[^\[\{].* {
@@ -85,13 +85,13 @@ void cleanString(char *s){
     cleanString(texto_quote);
     if(nome_autor==antigo_autor){
         fprintf(quotes,"<li>%s</li>\n", texto_quote);
-        printf("\n\t\"%s\"\n",texto_quote);
+        printf("Q");
         countQ++;
     }
     else{
         antigo_autor=nome_autor;
-        fprintf(quotes,"</ul>\n <p><strong>-- %s</strong></p>\n <ul><li>%s</li>\n", nome_autor , texto_quote);
-        printf("\n\t\"%s\"\n",texto_quote);
+        fprintf(quotes,"</ul>\n<p><strong>-- %s</strong></p>\n<ul><li>%s</li>\n", nome_autor , texto_quote);
+        printf("Q");
         countQ++;
     }
 }
@@ -119,11 +119,11 @@ int main() {
     
     fprintf(quotes,"<h1 align='center'> Lista das Quotes e Autores </h1>\n");
     fprintf(traducoes,"<h1 align='center'> Tabela das Traduções </h1>\n");
-    fprintf(traducoes,"<style> table, th, td { border: 2px solid black; border-collapse: collapse;} th, td {padding: 5px;} </style>\n <table> <tr><th>Quotes</th><th>Traduções</th></tr>\n");
+    fprintf(traducoes,"<style> table, th, td { border: 2px solid black; border-collapse: collapse;} th, td {padding: 5px;} </style>\n<table><tr><th>Quotes</th><th>Traduções</th></tr>\n");
     yylex();
     fprintf(traducoes,"</table>\n");
 
-    fprintf(estatistica,"<h1 align='center'> Estatisticas </h1>");
+    fprintf(estatistica,"<h1 align='center'> Estatisticas </h1>\n");
     fprintf(estatistica,"<h4>Encontrados %d autores</h4><br><hr>\n", countA);
     fprintf(estatistica,"<h4>Encontrados %d quotes</h4><br><hr>\n", countQ);
     fprintf(estatistica,"<h4>Encontradas %d traduções</h4><br><hr>\n", countT);
@@ -137,8 +137,8 @@ int main() {
     printf("Numero Autores = %d.\n", countA);
     printf("Numero Quotes = %d.\n", countQ);
     printf("Numero Traduções = %d\n", countT);
-    printf("Criados ficheiros HTML.\n");
-    printf("Vou terminar...\n");
+    printf("Criados ficheiros HTML.\nPor favor abrir o ficheiro index.html\n");
+    printf("Tudo terminado\n");
     return 0;
 }
 
