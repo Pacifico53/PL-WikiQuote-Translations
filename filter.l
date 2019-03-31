@@ -84,7 +84,7 @@ void cleanString(char *s){
 <QUOTES>^\*\ +[^\[\{].* {
     texto_quote = strdup(yytext);
     cleanString(texto_quote); 
-    fprintf(quotes,"<p>%s -- %s</p>\n", texto_quote , nome_autor);
+    fprintf(quotes,"<p>%s <strong>-- %s</strong></p>\n", texto_quote , nome_autor);
     printf("\n\t\"%s\"\n",texto_quote);
     countQ++;
     }
@@ -105,15 +105,18 @@ int main() {
     quotes = fopen("quotes.html", "w");
     traducoes = fopen("traducoes.html", "w");
     estatistica = fopen("estatistica.html", "w");
+    fprintf(inicial,"<h1 align='center'> Wiki Quotes: traduções </h1>\n");
+    fprintf(inicial,"<li><a href=\"%s\">%s</a><br><hr></li>\n","quotes.html", "Quotes com os Autores");
+    fprintf(inicial,"<li><a href=\"%s\">%s</a><br><hr></li>\n","traducoes.html", "Traduções");
+    fprintf(inicial,"<li><a href=\"%s\">%s</a><br><hr></li>\n","estatistica.html", "Estatistica");
     
-    fprintf(inicial,"<a href=\"%s\">%s</a><br><hr>\n","quotes.html", "Quotes com os Autores");
-    fprintf(inicial,"<a href=\"%s\">%s</a><br><hr>\n","traducoes.html", "Traduções");
-    fprintf(inicial,"<a href=\"%s\">%s</a><br><hr>\n","estatistica.html", "Estatistica");
-    
-    fprintf(traducoes,"<style> table, th, td { border: 1px solid black;} </style> <table> <tr><th>Quotes</th><th>Traduções</th></tr>\n");
+    fprintf(quotes,"<h1 align='center'> Lista das Quotes e Autores </h1>\n");
+    fprintf(traducoes,"<h1 align='center'> Tabela das Traduções </h1>\n");
+    fprintf(traducoes,"<style> table, th, td { border: 2px solid black; border-collapse: collapse;} th, td {padding: 5px;} </style>\n <table> <tr><th>Quotes</th><th>Traduções</th></tr>\n");
     yylex();
     fprintf(traducoes,"</table>\n");
 
+    fprintf(estatistica,"<h1 align='center'> Estatisticas </h1>");
     fprintf(estatistica,"<h4>Encontrados %d autores</h4><br><hr>\n", countA);
     fprintf(estatistica,"<h4>Encontrados %d quotes</h4><br><hr>\n", countQ);
     fprintf(estatistica,"<h4>Encontrados %d traducoes</h4><br><hr>\n", countT);
