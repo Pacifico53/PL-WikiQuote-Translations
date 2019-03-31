@@ -1,5 +1,4 @@
 %{
-
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -55,7 +54,6 @@ void cleanString(char *s){
     removeSubstring(s, "“");
     trim(s, NULL);
 }
-
 %}
 %x QUOTES
 %x ALL
@@ -114,7 +112,7 @@ int main() {
     quotes = fopen("quotes.html", "w");
     traducoes = fopen("traducoes.html", "w");
     estatistica = fopen("estatistica.html", "w");
-    fprintf(inicial,"<h1 align='center'> Wiki Quotes: traduções </h1>\n");
+    fprintf(inicial,"<h1 align='center'> Wiki Quotes: Traduções </h1>\n");
     fprintf(inicial,"<li><a href=\"%s\">%s</a><br><hr></li>\n","quotes.html", "Quotes com os Autores");
     fprintf(inicial,"<li><a href=\"%s\">%s</a><br><hr></li>\n","traducoes.html", "Traduções");
     fprintf(inicial,"<li><a href=\"%s\">%s</a><br><hr></li>\n","estatistica.html", "Estatistica");
@@ -128,7 +126,7 @@ int main() {
     fprintf(estatistica,"<h1 align='center'> Estatisticas </h1>");
     fprintf(estatistica,"<h4>Encontrados %d autores</h4><br><hr>\n", countA);
     fprintf(estatistica,"<h4>Encontrados %d quotes</h4><br><hr>\n", countQ);
-    fprintf(estatistica,"<h4>Encontrados %d traducoes</h4><br><hr>\n", countT);
+    fprintf(estatistica,"<h4>Encontradas %d traduções</h4><br><hr>\n", countT);
 
     fclose(inicial);
     fclose(quotes);
@@ -138,7 +136,8 @@ int main() {
     printf("Input todo percorrido.\n");
     printf("Numero Autores = %d.\n", countA);
     printf("Numero Quotes = %d.\n", countQ);
-    printf("Numero Traduções = %d\n", countT); 
+    printf("Numero Traduções = %d\n", countT);
+    printf("Criados ficheiros HTML.\n");
     printf("Vou terminar...\n");
     return 0;
 }
